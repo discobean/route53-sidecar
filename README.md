@@ -20,7 +20,12 @@ make build
 ./route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
 ```
 
-Build the docker image:
+Use the existing docker image locally:
+```
+docker run -v ~/.aws:/root/.aws discobean/route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
+```
+
+Build your own docker image:
 ```
 make docker
 ```
