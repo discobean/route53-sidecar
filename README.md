@@ -24,3 +24,21 @@ Build the docker image:
 ```
 make docker
 ```
+
+Policies required for AWS ECS Role:
+```
+- PolicyName: route53
+  PolicyDocument:
+    Statement:
+    - Effect: Allow
+      Action:
+        - route53:ChangeResourceRecordSets
+      Resource: !Sub arn:aws:route53:::hostedzone/${HOSTEDZONEID}
+- PolicyName: route53changes
+  PolicyDocument:
+    Statement:
+    - Effect: Allow
+      Action:
+        - route53:GetChange
+      Resource: "*"
+```
