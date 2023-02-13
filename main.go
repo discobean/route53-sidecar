@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -43,6 +45,13 @@ func configureFromFlags() {
 			log.Fatalf("Failed to fetch IPV4 public IP: %v", err)
 		}
 		ipAddress = publicIpv4
+	} else if ipAddress == "ecs" {
+		log.Infof("Fetching IP Address from ECS metadata")
+		metadata, err := getEcsMetadata()
+		if err != nil {
+			log.Fatalf("Failed to fetch ECS metadata: %v", err)
+		}
+		ipAddress = metadata.Networks[0].IPv4Addresses[0] // use the first IP address
 	}
 }
 
@@ -167,6 +176,33 @@ func waitForSync(changeSet *route53.ChangeResourceRecordSetsOutput) {
 
 		log.Infof("Route53 Change not yet propogated (ChangeInfo.Status = %s)...", *changeOutput.ChangeInfo.Status)
 	}
+}
+
+type ecsMetadata struct {
+	Networks []struct {
+		IPv4Addresses []string `json:"IPv4Addresses"`
+	} `json:"Networks"`
+}
+
+func getEcsMetadata() (*ecsMetadata, error) {
+	// Get metadata URI from ECS_CONTAINER_METADATA_URI_V4 or ECS_CONTAINER_METADATA_URI
+	uri := os.Getenv("ECS_CONTAINER_METADATA_URI_V4")
+	if uri == "" {
+		uri = os.Getenv("ECS_CONTAINER_METADATA_URI")
+	}
+	client := http.Client{
+		Timeout: 1 * time.Second, // 1 second timeout, same as ec2metadata
+	}
+	resp, err := client.Get(uri)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	metadata := &ecsMetadata{}
+	if err = json.NewDecoder(resp.Body).Decode(metadata); err != nil {
+		return nil, err
+	}
+	return metadata, nil
 }
 
 func main() {
