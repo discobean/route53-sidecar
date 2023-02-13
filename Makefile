@@ -1,8 +1,8 @@
 help:
 	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/:.*##/:/'
 
-ensure: ## Run dep ensure
-	dep ensure -v -update
+ensure: ## Run go get -u
+	go get -t -u ./...
 
 build: ensure ## Build a local binary
 	go build
