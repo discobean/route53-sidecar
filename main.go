@@ -56,10 +56,10 @@ func configureFromFlags() {
 }
 
 func dumpConfig() {
-	log.Infof("DNS=%v\n", dns)
-	log.Infof("DNSTTL=%v\n", dnsTTL)
-	log.Infof("HOSTEDZONE=%v\n", hostedZone)
-	log.Infof("IPADDRESS=%v\n", ipAddress)
+	log.Infof("DNS=%v", dns)
+	log.Infof("DNSTTL=%v", dnsTTL)
+	log.Infof("HOSTEDZONE=%v", hostedZone)
+	log.Infof("IPADDRESS=%v", ipAddress)
 }
 
 func catchSignals() {
