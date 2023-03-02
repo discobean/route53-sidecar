@@ -29,11 +29,11 @@ build-arm64: ensure
 
 .PHONY: docker-amd64
 docker-amd64: build-amd64
-	docker build -t route53-sidecar -t $(DOCKER_IMAGE_AMD64) .
+	docker build --platform linux/amd64 -t route53-sidecar -t $(DOCKER_IMAGE_AMD64) .
 
 .PHONY: docker-arm64
 docker-arm64: build-arm64
-	docker build -t route53-sidecar -t $(DOCKER_IMAGE_ARM64) .
+	docker build --platform linux/arm64 -t route53-sidecar -t $(DOCKER_IMAGE_ARM64) .
 
 .PHONY: docker
 docker: docker-amd64 docker-arm64 ## Build all docker images and manifest
