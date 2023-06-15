@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -18,16 +17,13 @@ import (
 )
 
 var (
-	dns          string
-	hostedZone   string
-	healthChecks string
-	dnsTTL       int
-	ipAddress    string
+	dns        string
+	hostedZone string
+	dnsTTL     int
+	ipAddress  string
 
-	gracefulStop = make(chan os.Signal)
+	gracefulStop = make(chan os.Signal, 1)
 	sess         = session.Must(session.NewSession())
-
-	wg sync.WaitGroup
 )
 
 func configureFromFlags() {
@@ -63,7 +59,6 @@ func dumpConfig() {
 }
 
 func catchSignals() {
-	defer wg.Done()
 	sig := <-gracefulStop
 	log.Infof("Caught Signal: %+v", sig)
 
@@ -140,6 +135,12 @@ func setupDNS() {
 		HostedZoneId: aws.String(hostedZone),
 	}
 
+	select {
+	case sig := <-gracefulStop:
+		log.Fatalf("Caught Signal before change: %+v", sig)
+	default:
+	}
+
 	changeSet, err := svc.ChangeResourceRecordSets(input)
 	if err != nil {
 		log.Fatalf("Failed to create DNS: %v", err.Error())
@@ -152,7 +153,7 @@ func setupDNS() {
 func waitForSync(changeSet *route53.ChangeResourceRecordSetsOutput) {
 	svc := route53.New(sess)
 
-	for true {
+	for {
 		time.Sleep(5 * time.Second)
 		failures := 0
 
@@ -209,12 +210,8 @@ func main() {
 	configureFromFlags()
 	dumpConfig()
 
-	signal.Notify(gracefulStop, syscall.SIGTERM)
-	signal.Notify(gracefulStop, syscall.SIGINT)
-
-	wg.Add(1)
-	go catchSignals()
+	signal.Notify(gracefulStop, syscall.SIGTERM, syscall.SIGINT)
 	setupDNS()
 
-	wg.Wait()
+	catchSignals()
 }
