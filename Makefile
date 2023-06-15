@@ -39,10 +39,14 @@ docker-arm64: build-arm64
 docker: docker-amd64 docker-arm64 ## Build all docker images and manifest
 
 .PHONY: push
-push: docker ## Push all docker images
+push: docker login ## Push all docker images
 	docker push $(DOCKER_IMAGE_AMD64)
 	docker push $(DOCKER_IMAGE_ARM64)
 	docker manifest create --amend $(DOCKER_IMAGE_NAME):$(VERSION) $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
 	docker manifest create --amend $(DOCKER_IMAGE_NAME):latest $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
 	docker manifest push --purge $(DOCKER_IMAGE_NAME):$(VERSION)
 	docker manifest push --purge $(DOCKER_IMAGE_NAME):latest
+
+.PHONY: login
+login: ## Login to docker
+	@docker login
