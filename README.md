@@ -1,5 +1,7 @@
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/defangio/route53-sidecar/latest)
+
 # route53-sidecar
-Adds a route53 record on Docker startup, removes it on SIGHUP shutdown
+Sidecar that adds a route53 record on container start, removes it on SIGHUP shutdown.
 
 1. Takes the IP address from EC2 or ECS metadata (or `IPADDRESS` environment)
 2. Creates a weighted A record pointing to `DNS` with TTL `DNSTTL` in the `HOSTEDZONE`
@@ -22,7 +24,7 @@ make build
 
 Use the existing docker image locally:
 ```
-docker run -v ~/.aws:/root/.aws discobean/route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
+docker run -v ~/.aws:/root/.aws defangio/route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
 ```
 
 Build your own docker image:
