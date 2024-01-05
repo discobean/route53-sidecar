@@ -49,4 +49,4 @@ push: docker login ## Push all docker images
 
 .PHONY: login
 login: ## Login to docker
-	@docker login
+	@docker login -u $(DOCKER)
