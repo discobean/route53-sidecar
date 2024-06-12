@@ -21,6 +21,7 @@ var (
 	hostedZone string
 	dnsTTL     int
 	ipAddress  string
+	setupDelay int
 
 	gracefulStop = make(chan os.Signal, 1)
 	sess         = session.Must(session.NewSession())
@@ -31,6 +32,7 @@ func configureFromFlags() {
 	flag.StringVar(&hostedZone, "hostedzone", "Z2AAAABCDEFGT4", "Hosted zone ID in route53")
 	flag.IntVar(&dnsTTL, "dnsttl", 10, "Timeout for DNS entry")
 	flag.StringVar(&ipAddress, "ipaddress", "public-ipv4", "IP Address for A Record")
+	flag.IntVar(&dnsTTL, "setupdelay", 10, "Wait time before setting up DNS (in seconds)")
 	flag.Parse()
 
 	if ipAddress == "public-ipv4" {
@@ -56,6 +58,7 @@ func dumpConfig() {
 	log.Infof("DNSTTL=%v", dnsTTL)
 	log.Infof("HOSTEDZONE=%v", hostedZone)
 	log.Infof("IPADDRESS=%v", ipAddress)
+	log.Infof("SETUPDELAY=%v", setupDelay)
 }
 
 func catchSignals() {
@@ -109,6 +112,20 @@ func tearDownDNS() {
 
 func setupDNS() {
 	log.Infof("Setting up Route 53 DNS Name A %s => %s", dns, ipAddress)
+
+	// Wait for setupDelay, also check for signals during this period
+	if setupDelay > 0 {
+		log.Infof("Waiting %d seconds before setting up DNS (SETUPDELAY)", setupDelay)
+		for i := 0; i < setupDelay; i++ {
+			select {
+			case sig := <-gracefulStop:
+				log.Fatalf("Caught Signal during SETUPDELAY period: %+v", sig)
+			default:
+				time.Sleep(1 * time.Second)
+			}
+		}
+		log.Info("Finished waiting")
+	}
 
 	svc := route53.New(sess)
 	input := &route53.ChangeResourceRecordSetsInput{
