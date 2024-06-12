@@ -43,9 +43,17 @@ push: docker login ## Push all docker images
 	docker push $(DOCKER_IMAGE_AMD64)
 	docker push $(DOCKER_IMAGE_ARM64)
 	docker manifest create --amend $(DOCKER_IMAGE_NAME):$(VERSION) $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
-	docker manifest create --amend $(DOCKER_IMAGE_NAME):latest $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
 	docker manifest push --purge $(DOCKER_IMAGE_NAME):$(VERSION)
+
+.PHONY: push-latest
+push-latest: push ## Push all docker images
+	docker manifest create --amend $(DOCKER_IMAGE_NAME):latest $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
 	docker manifest push --purge $(DOCKER_IMAGE_NAME):latest
+
+.PHONY: push-test
+push-test: push ## Push all docker images
+	docker manifest create --amend $(DOCKER_IMAGE_NAME):test $(DOCKER_IMAGE_AMD64) $(DOCKER_IMAGE_ARM64)
+	docker manifest push --purge $(DOCKER_IMAGE_NAME):test
 
 .PHONY: login
 login: ## Login to docker
