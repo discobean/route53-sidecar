@@ -32,7 +32,7 @@ func configureFromFlags() {
 	flag.StringVar(&hostedZone, "hostedzone", "Z2AAAABCDEFGT4", "Hosted zone ID in route53")
 	flag.IntVar(&dnsTTL, "dnsttl", 10, "Timeout for DNS entry")
 	flag.StringVar(&ipAddress, "ipaddress", "public-ipv4", "IP Address for A Record")
-	flag.IntVar(&dnsTTL, "setupdelay", 10, "Wait time before setting up DNS (in seconds)")
+	flag.IntVar(&setupDelay, "setupdelay", 10, "Wait time before setting up DNS (in seconds)")
 	flag.Parse()
 
 	if ipAddress == "public-ipv4" {
