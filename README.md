@@ -1,4 +1,4 @@
-![Docker Image Size (tag)](https://img.shields.io/docker/image-size/defangio/route53-sidecar/latest)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/discobean/route53-sidecar/latest)
 
 # route53-sidecar
 Sidecar that adds a route53 record on container start, removes it on SIGHUP shutdown.
@@ -24,7 +24,7 @@ make build
 
 Use the existing docker image locally:
 ```
-docker run -v ~/.aws:/root/.aws defangio/route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
+docker run -v ~/.aws:/root/.aws discobean/route53-sidecar -dns="test.example.com" -hostedzone=ABCDEFGHIJKLM4 -ipaddress=127.0.0.1
 ```
 
 Build your own docker image:
