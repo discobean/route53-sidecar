@@ -3,7 +3,7 @@ module github.com/defang-io/route53-sidecar
 go 1.18
 
 require (
-	github.com/aws/aws-sdk-go v1.53.21
+	github.com/aws/aws-sdk-go v1.54.1
 	github.com/namsral/flag v1.7.4-pre
 	github.com/sirupsen/logrus v1.9.3
 )
